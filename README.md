@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🎮 MCPBridge
+# 🎮 Roblox Ollama MCP Bridge
 
 **Connect Claude Code and Ollama to Roblox Studio via the Model Context Protocol**
 
