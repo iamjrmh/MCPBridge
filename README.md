@@ -110,6 +110,7 @@ npm install
 > 1. Open **Assistant**
 > 2. Click **... → Manage MCP Servers**
 > 3. Turn on **Enable Studio as MCP server**
+> 4. Restart Roblox Studio
 
 ---
 
