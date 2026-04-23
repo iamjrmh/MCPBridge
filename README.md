@@ -32,7 +32,7 @@ These steps are required regardless of your platform or install method.
 
 ### 1 — Download the source
 
-Click **Code → Download ZIP** at the top of this page and extract it somewhere on your machine. This contains `MCPBridge.exe` for Windows users and all the files needed for manual setup.
+Click **Code → Download ZIP** at the top of this page and extract it somewhere on your machine. This contains `MCPBridge.exe` for Windows and `MCPBridge.app` for macOS.
 
 ### 2 — Install Node.js via NVM
 
@@ -93,7 +93,9 @@ npm install
 
 ---
 
-## 🚀 Quick Install <img src="https://img.shields.io/badge/Windows-Recommended-0078d4?logo=windows&logoColor=white" alt="Windows Recommended" height="20"/>
+## 🚀 Quick Install
+
+### 🪟 Windows <img src="https://img.shields.io/badge/Recommended-0078d4?logo=windows&logoColor=white" alt="Recommended" height="20"/>
 
 After completing the prerequisites above, **MCPBridge.exe handles the rest automatically** — no manual config editing or file copying required.
 
@@ -103,8 +105,22 @@ After completing the prerequisites above, **MCPBridge.exe handles the rest autom
 > [!NOTE]
 > Make sure Roblox Studio has been installed at least once before running the installer so the Plugins folder can be located automatically.
 
+### 🍎 macOS <img src="https://img.shields.io/badge/Recommended-000000?logo=apple&logoColor=white" alt="Recommended" height="20"/>
+
+After completing the prerequisites above, **MCPBridge.app handles the rest automatically** — no manual config editing or file copying required.
+
+1. Open the extracted folder
+2. Double-click **MCPBridge.app** to launch it
+3. Follow the on-screen instructions
+
+> [!NOTE]
+> On first launch macOS may show a security warning. Go to **System Settings → Privacy & Security** and click **Open Anyway** to allow it.
+
+> [!NOTE]
+> Make sure Roblox Studio has been installed at least once before running the installer so the Plugins folder can be located automatically. The app will automatically extract the `mcp-server` and `roblox-plugin` folders next to itself on first run.
+
 > [!TIP]
-> **Linux & macOS users:** The `.exe` installer is Windows-only. Please follow the [Manual Setup](#-manual-setup) section below to move the required files yourself. Native installers for macOS and Linux are planned for a future release.
+> **Linux users:** Please follow the [Manual Setup](#-manual-setup) section below. A native Linux installer is planned for a future release.
 
 ---
 
@@ -249,6 +265,26 @@ ollama launch claude --model gemma4
 
 </details>
 
+<details>
+<summary><b>🍎 macOS — "App can't be opened" security warning</b></summary>
+
+macOS may block the app on first launch since it isn't notarized. To allow it:
+
+1. Go to **System Settings → Privacy & Security**
+2. Scroll down and click **Open Anyway** next to MCPBridge
+3. Confirm in the dialog that appears
+
+Alternatively, right-click the `.app` and choose **Open** to bypass the warning directly.
+
+</details>
+
+<details>
+<summary><b>🍎 macOS — mcp-server or roblox-plugin folder not found</b></summary>
+
+On first launch, MCPBridge automatically extracts these folders next to the `.app`. If auto-detection still fails, use the **Browse** button in the app to point to them manually. The folders will be located next to `MCPBridge.app` in the same directory.
+
+</details>
+
 ---
 
 ## 📁 File Structure
@@ -259,9 +295,12 @@ roblox-ollama-mcp/
 │   ├── index.js               ← MCP + HTTP bridge server
 │   └── package.json
 ├── roblox-plugin/
-│   └── OllamaMCP.lua          ← Studio plugin (auto-installed on Windows)
-├── install_mcp.py             ← Installer source
+│   └── OllamaMCP.lua          ← Studio plugin (auto-installed on Windows & macOS)
+├── MCPBridge.py               ← Installer source
 ├── MCPBridge.exe              ← Windows installer (double-click to run)
+├── MCPBridge.app              ← macOS installer (double-click to run)
+├── build.bat                  ← Windows build script
+├── build.sh                   ← macOS build script
 ├── claude_mcp_config.json     ← Example Claude Code config snippet
 ├── start.sh                   ← Helper startup script
 └── README.md
