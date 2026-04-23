@@ -96,7 +96,7 @@ This installs the latest Node.js LTS release and sets it as your default.
 Navigate into the extracted folder and install dependencies:
 
 ```bash
-cd mcp-server
+cd roblox-ollama-mcp/mcp-server
 npm install
 ```
 
@@ -110,7 +110,6 @@ npm install
 > 1. Open **Assistant**
 > 2. Click **... → Manage MCP Servers**
 > 3. Turn on **Enable Studio as MCP server**
-> 4. Restart Roblox Studio
 
 ---
 
@@ -118,27 +117,26 @@ npm install
 
 ### 🪟 Windows <img src="https://img.shields.io/badge/Recommended-0078d4?logo=windows&logoColor=white" alt="Recommended" height="20"/>
 
-After completing the prerequisites above, **MCPBridge.exe handles the rest automatically** - no manual config editing or file copying required.
-
-1. Open the extracted folder and run `MCPBridge.exe`
-2. Follow the on-screen instructions
-
-> [!NOTE]
-> Make sure Roblox Studio has been installed at least once before running the installer so the Plugins folder can be located automatically.
+1. Launch **`MCPBridge.exe`**
+2. If `index.js` or `OllamaMCP.lua` weren't auto-detected, press **Browse** and select them manually - paths are saved automatically
+3. Exit MCPBridge, then launch Claude Code via Ollama:
+   ```bash
+   ollama launch claude --model minimax-m2.5:cloud
+   ```
+4. Start giving Claude prompts for your Roblox game and watch it build!
 
 ### 🍎 macOS <img src="https://img.shields.io/badge/Recommended-000000?logo=apple&logoColor=white" alt="Recommended" height="20"/>
-
-After completing the prerequisites above, **MCPBridge.pkg handles the rest automatically** - no manual config editing or file copying required.
-
-1. Open the extracted folder
-2. Double-click **MCPBridge.pkg** to launch it
-3. Follow the on-screen instructions
 
 > [!NOTE]
 > On first launch macOS may show a security warning. Go to **System Settings → Privacy & Security** and click **Open Anyway** to allow it.
 
-> [!NOTE]
-> Make sure Roblox Studio has been installed at least once before running the installer so the Plugins folder can be located automatically. The installer will automatically extract the `mcp-server` and `roblox-plugin` folders next to itself on first run.
+1. Launch **`MCPBridge.pkg`**
+2. If `index.js` or `OllamaMCP.lua` weren't auto-detected, press **Browse** and select them manually - paths are saved automatically
+3. Exit MCPBridge, then launch Claude Code via Ollama:
+   ```bash
+   ollama launch claude --model minimax-m2.5:cloud
+   ```
+4. Start giving Claude prompts for your Roblox game and watch it build!
 
 ---
 
