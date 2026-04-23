@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "roblox-ollama": {
+      "command": "node",
+      "args": ["/ABSOLUTE/PATH/TO/roblox-ollama-mcp/mcp-server/index.js"],
+      "env": {}
+    }
+  }
+}
