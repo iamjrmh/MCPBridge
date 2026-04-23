@@ -311,17 +311,14 @@ On first launch, MCPBridge automatically extracts these folders next to the `.pk
 ## 📁 File Structure
 
 ```
-roblox-ollama-mcp/
+MCPBridge/
 ├── mcp-server/
 │   ├── index.js               ← MCP + HTTP bridge server
 │   └── package.json
 ├── roblox-plugin/
 │   └── OllamaMCP.lua          ← Studio plugin (auto-installed on Windows & macOS)
-├── MCPBridge.py               ← Installer source
 ├── MCPBridge.exe              ← Windows installer (double-click to run)
 ├── MCPBridge.pkg              ← macOS installer (double-click to run)
-├── build.bat                  ← Windows build script
-├── build.sh                   ← macOS build script
 ├── claude_mcp_config.json     ← Example Claude Code config snippet
 ├── start.sh                   ← Helper startup script
 └── README.md
