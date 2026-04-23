@@ -84,7 +84,10 @@ Then restart Claude Code. You should see `roblox-ollama` in your MCP tools list.
 5. The **"MCP Bridge"** button appears in the Plugins toolbar
 
 > [!IMPORTANT]
-> Enable HTTP requests in Studio: **File → Studio Settings → Studio → Allow HTTP Requests** ✓
+> To enable the MCP server in Studio:
+> 1. Open **Assistant**
+> 2. Click **… → Manage MCP Servers**
+> 3. Turn on **Enable Studio as MCP server**
 
 ### 4 — Start Ollama
 
