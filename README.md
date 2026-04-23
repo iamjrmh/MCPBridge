@@ -25,15 +25,36 @@ Claude Code (stdio)
 
 ---
 
-## ⚙️ Prerequisites — Required for Everyone
+## ⚙️ Prerequisites - Required for Everyone
 
 These steps are required regardless of your platform or install method.
 
-### 1 — Download the source
+### 1 - Download the source
 
-Click **Code → Download ZIP** at the top of this page and extract it somewhere on your machine. This contains `MCPBridge.exe` for Windows and `MCPBridge.app` for macOS.
+Click **Code → Download ZIP** at the top of this page and extract it somewhere on your machine.
 
-### 2 — Install Node.js via NVM
+Then grab the installer for your platform from the [**Releases page**](https://github.com):
+
+<table>
+<tr>
+<td align="center" width="50%">
+<a href="https://github.com/iamjrmh/MCPBridge/releases/latest/download/MCPBridge.exe">
+<img src="https://img.shields.io/badge/Download-MCPBridge.exe-0078d4?style=for-the-badge&logo=windows&logoColor=white" alt="Download MCPBridge.exe"/>
+</a><br/>
+<sub>Windows Installer</sub>
+</td>
+<td align="center" width="50%">
+<a href="https://github.com/iamjrmh/MCPBridge/releases/latest/download/MCPBridge.pkg">
+<img src="https://img.shields.io/badge/Download-MCPBridge.pkg-000000?style=for-the-badge&logo=apple&logoColor=white" alt="Download MCPBridge.pkg"/>
+</a><br/>
+<sub>macOS Installer</sub>
+</td>
+</tr>
+</table>
+
+Place the installer in the same folder as the extracted source before continuing.
+
+### 2 - Install Node.js via NVM
 
 <details>
 <summary><b>🪟 Windows</b></summary>
@@ -70,7 +91,7 @@ This installs the latest Node.js LTS release and sets it as your default.
 
 </details>
 
-### 3 — Install server dependencies
+### 3 - Install server dependencies
 
 Navigate into the extracted folder and install dependencies:
 
@@ -82,12 +103,12 @@ npm install
 > [!WARNING]
 > Do not skip this step. Without it, the MCP server will not start and nothing will connect.
 
-### 4 — Enable Studio as MCP Server
+### 4 - Enable Studio as MCP Server
 
 > [!IMPORTANT]
 > To enable the MCP server in Studio:
 > 1. Open **Assistant**
-> 2. Click **… → Manage MCP Servers**
+> 2. Click **... → Manage MCP Servers**
 > 3. Turn on **Enable Studio as MCP server**
 
 ---
@@ -96,7 +117,7 @@ npm install
 
 ### 🪟 Windows <img src="https://img.shields.io/badge/Recommended-0078d4?logo=windows&logoColor=white" alt="Recommended" height="20"/>
 
-After completing the prerequisites above, **MCPBridge.exe handles the rest automatically** — no manual config editing or file copying required.
+After completing the prerequisites above, **MCPBridge.exe handles the rest automatically** - no manual config editing or file copying required.
 
 1. Open the extracted folder and run `MCPBridge.exe`
 2. Follow the on-screen instructions
@@ -106,23 +127,23 @@ After completing the prerequisites above, **MCPBridge.exe handles the rest autom
 
 ### 🍎 macOS <img src="https://img.shields.io/badge/Recommended-000000?logo=apple&logoColor=white" alt="Recommended" height="20"/>
 
-After completing the prerequisites above, **MCPBridge.app handles the rest automatically** — no manual config editing or file copying required.
+After completing the prerequisites above, **MCPBridge.pkg handles the rest automatically** - no manual config editing or file copying required.
 
 1. Open the extracted folder
-2. Double-click **MCPBridge.app** to launch it
+2. Double-click **MCPBridge.pkg** to launch it
 3. Follow the on-screen instructions
 
 > [!NOTE]
 > On first launch macOS may show a security warning. Go to **System Settings → Privacy & Security** and click **Open Anyway** to allow it.
 
 > [!NOTE]
-> Make sure Roblox Studio has been installed at least once before running the installer so the Plugins folder can be located automatically. The app will automatically extract the `mcp-server` and `roblox-plugin` folders next to itself on first run.
+> Make sure Roblox Studio has been installed at least once before running the installer so the Plugins folder can be located automatically. The installer will automatically extract the `mcp-server` and `roblox-plugin` folders next to itself on first run.
 
 ---
 
 ## 📦 Manual Setup
 
-### 1 — Configure Claude Code
+### 1 - Configure Claude Code
 
 Add the MCP server to Claude Code's config. The config file lives at:
 
@@ -146,7 +167,7 @@ Add or merge this block (replace the path with your actual path):
 
 Then restart Claude Code. You should see `roblox-ollama` in your MCP tools list.
 
-### 2 — Install the Roblox Studio Plugin
+### 2 - Install the Roblox Studio Plugin
 
 1. Open Roblox Studio
 2. Go to **Plugins → Plugin Folder** (opens a folder in your file explorer)
@@ -157,10 +178,10 @@ Then restart Claude Code. You should see `roblox-ollama` in your MCP tools list.
 > [!IMPORTANT]
 > To enable the MCP server in Studio:
 > 1. Open **Assistant**
-> 2. Click **… → Manage MCP Servers**
+> 2. Click **... → Manage MCP Servers**
 > 3. Turn on **Enable Studio as MCP server**
 
-### 3 — Start Ollama
+### 3 - Start Ollama
 
 Pick a model and launch it with Ollama. The bridge calls the REST API at `http://localhost:11434` automatically.
 
@@ -183,9 +204,9 @@ ollama launch claude --model qwen3-coder
 ollama launch claude --model gemma4
 ```
 
-### 4 — Connect everything
+### 4 - Connect everything
 
-1. In Roblox Studio, click **"MCP Bridge"** in the toolbar → widget shows 🟢 Connected
+1. In Roblox Studio, click **"MCP Bridge"** in the toolbar - widget shows 🟢 Connected
 2. Open Claude Code in your terminal
 3. Start asking Claude to work on your Roblox scripts!
 
@@ -255,28 +276,28 @@ ollama launch claude --model gemma4
 <details>
 <summary><b>"Command timed out"</b></summary>
 
-- The plugin may have been deactivated — click the toolbar button again
+- The plugin may have been deactivated - click the toolbar button again
 - Check the plugin widget for error messages
 
 </details>
 
 <details>
-<summary><b>🍎 macOS — "App can't be opened" security warning</b></summary>
+<summary><b>🍎 macOS - "App can't be opened" security warning</b></summary>
 
-macOS may block the app on first launch since it isn't notarized. To allow it:
+macOS may block the installer on first launch since it isn't notarized. To allow it:
 
 1. Go to **System Settings → Privacy & Security**
 2. Scroll down and click **Open Anyway** next to MCPBridge
 3. Confirm in the dialog that appears
 
-Alternatively, right-click the `.app` and choose **Open** to bypass the warning directly.
+Alternatively, right-click the `.pkg` and choose **Open** to bypass the warning directly.
 
 </details>
 
 <details>
-<summary><b>🍎 macOS — mcp-server or roblox-plugin folder not found</b></summary>
+<summary><b>🍎 macOS - mcp-server or roblox-plugin folder not found</b></summary>
 
-On first launch, MCPBridge automatically extracts these folders next to the `.app`. If auto-detection still fails, use the **Browse** button in the app to point to them manually. The folders will be located next to `MCPBridge.app` in the same directory.
+On first launch, MCPBridge automatically extracts these folders next to the `.pkg`. If auto-detection still fails, use the **Browse** button in the app to point to them manually. The folders will be located next to `MCPBridge.pkg` in the same directory.
 
 </details>
 
@@ -293,7 +314,7 @@ roblox-ollama-mcp/
 │   └── OllamaMCP.lua          ← Studio plugin (auto-installed on Windows & macOS)
 ├── MCPBridge.py               ← Installer source
 ├── MCPBridge.exe              ← Windows installer (double-click to run)
-├── MCPBridge.app              ← macOS installer (double-click to run)
+├── MCPBridge.pkg              ← macOS installer (double-click to run)
 ├── build.bat                  ← Windows build script
 ├── build.sh                   ← macOS build script
 ├── claude_mcp_config.json     ← Example Claude Code config snippet
