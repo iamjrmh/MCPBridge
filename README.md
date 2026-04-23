@@ -26,31 +26,66 @@ Claude Code (stdio)
 
 ---
 
+## ⚙️ Prerequisites — Required for Everyone
+
+These steps are required regardless of your platform or install method.
+
+### 1 — Download the source
+
+Click **Code → Download ZIP** at the top of this page and extract it somewhere on your machine. This contains `MCPBridge.exe` for Windows users and all the files needed for manual setup.
+
+### 2 — Install Node.js via NVM
+
+Using [nvm-windows](https://github.com/coreybutler/nvm-windows/releases) is the recommended way to manage Node.js. Download and run **`nvm-setup.exe`** from the releases page, then open a new terminal and run:
+
+```bash
+nvm install lts
+nvm use lts
+nvm alias default lts
+```
+
+This installs the latest Node.js LTS release and sets it as your default.
+
+### 3 — Install server dependencies
+
+Navigate into the extracted folder and install dependencies:
+
+```bash
+cd roblox-ollama-mcp/mcp-server
+npm install
+```
+
+> [!WARNING]
+> Do not skip this step. Without it, the MCP server will not start and nothing will connect.
+
+### 4 — Enable Studio as MCP Server
+
+> [!IMPORTANT]
+> To enable the MCP server in Studio:
+> 1. Open **Assistant**
+> 2. Click **… → Manage MCP Servers**
+> 3. Turn on **Enable Studio as MCP server**
+
+---
+
 ## 🚀 Quick Install <img src="https://img.shields.io/badge/Windows-Recommended-0078d4?logo=windows&logoColor=white" alt="Windows Recommended" height="20"/>
 
-**MCPBridge.exe handles everything automatically** — no manual config editing or file copying required.
+After completing the prerequisites above, **MCPBridge.exe handles the rest automatically** — no manual config editing or file copying required.
 
-1. Download `MCPBridge.exe` from the [latest release](../../releases/latest)
-2. Run it and follow the on-screen instructions
+1. Open the extracted folder and run `MCPBridge.exe`
+2. Follow the on-screen instructions
 
 > [!NOTE]
 > Make sure Roblox Studio has been installed at least once before running the installer so the Plugins folder can be located automatically.
 
 > [!TIP]
-> **Linux & macOS users:** The `.exe` installer is Windows-only. Please follow the [Manual Setup](#-manual-setup) section below to move the required files yourself.
+> **Linux & macOS users:** The `.exe` installer is Windows-only. Please follow the [Manual Setup](#-manual-setup) section below to move the required files yourself. Native installers for macOS and Linux are planned for a future release.
 
 ---
 
 ## 📦 Manual Setup
 
-### 1 — Install dependencies
-
-```bash
-cd mcp-server
-npm install
-```
-
-### 2 — Configure Claude Code
+### 1 — Configure Claude Code
 
 Add the MCP server to Claude Code's config. The config file lives at:
 
@@ -75,7 +110,7 @@ Add or merge this block (replace the path with your actual path):
 
 Then restart Claude Code. You should see `roblox-ollama` in your MCP tools list.
 
-### 3 — Install the Roblox Studio Plugin
+### 2 — Install the Roblox Studio Plugin
 
 1. Open Roblox Studio
 2. Go to **Plugins → Plugin Folder** (opens a folder in your file explorer)
@@ -89,15 +124,30 @@ Then restart Claude Code. You should see `roblox-ollama` in your MCP tools list.
 > 2. Click **… → Manage MCP Servers**
 > 3. Turn on **Enable Studio as MCP server**
 
-### 4 — Start Ollama
+### 3 — Start Ollama
+
+Pick a model and launch it with Ollama. The bridge calls the REST API at `http://localhost:11434` automatically.
+
+**Recommended models:**
 
 ```bash
+# Balanced cloud model (default)
 ollama launch claude --model minimax-m2.5:cloud
+
+# Newer cloud model
+ollama launch claude --model minimax-m2.7:cloud
+
+# General purpose
+ollama launch claude --model qwen3.5
+
+# Coding focused
+ollama launch claude --model qwen3-coder
+
+# Lightweight / fast
+ollama launch claude --model gemma4
 ```
 
-The bridge calls Ollama's REST API at `http://localhost:11434` automatically.
-
-### 5 — Connect everything
+### 4 — Connect everything
 
 1. In Roblox Studio, click **"MCP Bridge"** in the toolbar → widget shows 🟢 Connected
 2. Open Claude Code in your terminal
