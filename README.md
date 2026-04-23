@@ -36,15 +36,40 @@ Click **Code → Download ZIP** at the top of this page and extract it somewhere
 
 ### 2 — Install Node.js via NVM
 
-Using [nvm-windows](https://github.com/coreybutler/nvm-windows/releases) is the recommended way to manage Node.js. Download and run **`nvm-setup.exe`** from the releases page, then open a new terminal and run:
+<details>
+<summary><b>🪟 Windows</b></summary>
+
+Download and run **`nvm-setup.exe`** from the [nvm-windows releases page](https://github.com/coreybutler/nvm-windows/releases), then open a new terminal and run:
 
 ```bash
 nvm install lts
 nvm use lts
-nvm alias default lts
+```
+
+This installs the latest Node.js LTS release and sets it as your active version.
+
+</details>
+
+<details>
+<summary><b>🍎 macOS / 🐧 Linux</b></summary>
+
+Install [nvm](https://github.com/nvm-sh/nvm) by running the install script in your terminal:
+
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+```
+
+Then restart your terminal (or run `source ~/.bashrc` / `source ~/.zshrc`), and run:
+
+```bash
+nvm install --lts
+nvm use --lts
+nvm alias default 'lts/*'
 ```
 
 This installs the latest Node.js LTS release and sets it as your default.
+
+</details>
 
 ### 3 — Install server dependencies
 
