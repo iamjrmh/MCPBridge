@@ -6,7 +6,6 @@
 
 [![Platform - Windows](https://img.shields.io/badge/platform-Windows-0078d4?logo=windows&logoColor=white)](https://github.com)
 [![Platform - macOS](https://img.shields.io/badge/platform-macOS-000000?logo=apple&logoColor=white)](https://github.com)
-[![Platform - Linux](https://img.shields.io/badge/platform-Linux-FCC624?logo=linux&logoColor=black)](https://github.com)
 [![Node.js - v22 LTS](https://img.shields.io/badge/Node.js-v22_LTS-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
 [![Ollama](https://img.shields.io/badge/Ollama-minimax--m2.5:cloud-black?logo=ollama&logoColor=white)](https://ollama.com)
 [![MCP](https://img.shields.io/badge/Protocol-MCP-blueviolet)](https://modelcontextprotocol.io)
@@ -51,7 +50,7 @@ This installs the latest Node.js LTS release and sets it as your active version.
 </details>
 
 <details>
-<summary><b>🍎 macOS / 🐧 Linux</b></summary>
+<summary><b>🍎 macOS</b></summary>
 
 Install [nvm](https://github.com/nvm-sh/nvm) by running the install script in your terminal:
 
@@ -59,7 +58,7 @@ Install [nvm](https://github.com/nvm-sh/nvm) by running the install script in yo
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
 ```
 
-Then restart your terminal (or run `source ~/.bashrc` / `source ~/.zshrc`), and run:
+Then restart your terminal (or run `source ~/.zshrc`), and run:
 
 ```bash
 nvm install --lts
@@ -119,9 +118,6 @@ After completing the prerequisites above, **MCPBridge.app handles the rest autom
 > [!NOTE]
 > Make sure Roblox Studio has been installed at least once before running the installer so the Plugins folder can be located automatically. The app will automatically extract the `mcp-server` and `roblox-plugin` folders next to itself on first run.
 
-> [!TIP]
-> **Linux users:** Please follow the [Manual Setup](#-manual-setup) section below. A native Linux installer is planned for a future release.
-
 ---
 
 ## 📦 Manual Setup
@@ -134,7 +130,6 @@ Add the MCP server to Claude Code's config. The config file lives at:
 |---------|-------------------------------|
 | macOS   | `~/.claude.json`               |
 | Windows | `%USERPROFILE%\.claude.json`  |
-| Linux   | `~/.claude.json`               |
 
 Add or merge this block (replace the path with your actual path):
 
