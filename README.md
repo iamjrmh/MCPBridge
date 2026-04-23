@@ -115,7 +115,8 @@ npm install
 
 ## 🚀 Quick Install
 
-### 🪟 Windows <img src="https://img.shields.io/badge/Recommended-0078d4?logo=windows&logoColor=white" alt="Recommended" height="20"/>
+<details>
+<summary><b>🪟 Windows</b> <img src="https://img.shields.io/badge/Recommended-0078d4?logo=windows&logoColor=white" alt="Recommended" height="20"/></summary>
 
 1. Launch **`MCPBridge.exe`**
 2. If `index.js` or `OllamaMCP.lua` weren't auto-detected, press **Browse** and select them manually - paths are saved automatically
@@ -125,7 +126,10 @@ npm install
    ```
 4. Start giving Claude prompts for your Roblox game and watch it build!
 
-### 🍎 macOS <img src="https://img.shields.io/badge/Recommended-000000?logo=apple&logoColor=white" alt="Recommended" height="20"/>
+</details>
+
+<details>
+<summary><b>🍎 macOS</b> <img src="https://img.shields.io/badge/Recommended-000000?logo=apple&logoColor=white" alt="Recommended" height="20"/></summary>
 
 > [!NOTE]
 > On first launch macOS may show a security warning. Go to **System Settings → Privacy & Security** and click **Open Anyway** to allow it.
@@ -137,6 +141,8 @@ npm install
    ollama launch claude --model minimax-m2.5:cloud
    ```
 4. Start giving Claude prompts for your Roblox game and watch it build!
+
+</details>
 
 ---
 
