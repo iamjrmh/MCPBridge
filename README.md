@@ -96,7 +96,7 @@ This installs the latest Node.js LTS release and sets it as your default.
 Navigate into the extracted folder and install dependencies:
 
 ```bash
-cd roblox-ollama-mcp/mcp-server
+cd /mcp-server
 npm install
 ```
 
@@ -164,7 +164,7 @@ Add or merge this block (replace the path with your actual path):
   "mcpServers": {
     "roblox-ollama": {
       "command": "node",
-      "args": ["/absolute/path/to/roblox-ollama-mcp/mcp-server/index.js"]
+      "args": ["/absolute/path/to/mcp-server/index.js"]
     }
   }
 }
