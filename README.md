@@ -4,11 +4,13 @@
 
 **Connect Claude Code and Ollama to Roblox Studio and Blender via the Model Context Protocol**
 
-[![Platform - Windows](https://img.shields.io/badge/platform-Windows-0078d4?logo=windows&logoColor=white)](https://github.com)
-[![Platform - macOS](https://img.shields.io/badge/platform-macOS-000000?logo=apple&logoColor=white)](https://github.com)
-[![Node.js - v22 LTS](https://img.shields.io/badge/Node.js-v22_LTS-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
+[![Windows](https://img.shields.io/badge/Windows-0078d4?logo=windows&logoColor=white)](https://github.com)
+[![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white)](https://github.com)
+[![Node.js](https://img.shields.io/badge/Node.js-v22_LTS-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
 [![Ollama](https://img.shields.io/badge/Ollama-black?logo=ollama&logoColor=white)](https://ollama.com)
-[![Claude Code](https://awesome.re/mentioned-badge.svg)](https://github.com/hesreallyhim/awesome-claude-code)
+[![Claude Code](https://img.shields.io/badge/Claude-orange?logo=claude&logoColor=white)](https://code.claude.com/docs/en/overview)
+[![Blender](https://img.shields.io/badge/Blender-orange?logo=blender&logoColor=white)](https://www.blender.org/)
+[![Roblox](https://img.shields.io/badge/Roblox-gray?logo=roblox&logoColor=white)](https://www.roblox.com/)
 [![MCP](https://img.shields.io/badge/Protocol-MCP-blueviolet)](https://modelcontextprotocol.io)
 
 </div>
