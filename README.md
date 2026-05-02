@@ -2,7 +2,7 @@
 
 # MCPBridge
 
-**Connect Claude Code and Ollama to Roblox Studio via the Model Context Protocol**
+**Connect Claude Code and Ollama to Roblox Studio and Blender via the Model Context Protocol**
 
 [![Platform - Windows](https://img.shields.io/badge/platform-Windows-0078d4?logo=windows&logoColor=white)](https://github.com)
 [![Platform - macOS](https://img.shields.io/badge/platform-macOS-000000?logo=apple&logoColor=white)](https://github.com)
@@ -19,6 +19,8 @@ Claude Code (stdio)
       │ MCP protocol
       ▼
   MCP Server ──── HTTP :7842 ───► Roblox Studio Plugin (Lua)
+      │
+      ├──── HTTP :7843 ───► Blender Plugin (Python)
       │
       └── Ollama API (:11434) ──► minimax-m2.5:cloud
 ```
@@ -96,7 +98,7 @@ This installs the latest Node.js LTS release and sets it as your default.
 Navigate into the extracted folder and install dependencies:
 
 ```bash
-cd /mcp-server
+cd MCPBridge/mcp-server
 npm install
 ```
 
@@ -119,12 +121,15 @@ npm install
 <summary><b>🪟 Windows</b> <img src="https://img.shields.io/badge/Recommended-0078d4?logo=windows&logoColor=white" alt="Recommended" height="20"/></summary>
 
 1. Launch **`MCPBridge.exe`**
-2. If `index.js` or `OllamaMCP.lua` weren't auto-detected, press **Browse** and select them manually - paths are saved automatically
-3. Exit MCPBridge, then launch Claude Code via Ollama:
+2. If `index.js` or `OllamaMCP.lua` weren't auto-detected, press **Browse** and select them manually
+3. Click **Apply Changes** — this writes a single `mcpbridge` entry to your `claude.json` and installs the Roblox plugin automatically
+4. **Roblox Studio:** click **Launch Studio** in the app, or open it manually
+5. **Blender:** select your install from the dropdown and click **Launch Blender**, then install the addon once (see [Blender Plugin Setup](#blender-plugin-setup))
+6. Exit MCPBridge, then launch Claude Code via Ollama:
    ```bash
    ollama launch claude --model minimax-m2.5:cloud
    ```
-4. Start giving Claude prompts for your Roblox game and watch it build!
+7. Start giving Claude prompts and watch it work!
 
 </details>
 
@@ -135,14 +140,34 @@ npm install
 > On first launch macOS may show a security warning. Go to **System Settings → Privacy & Security** and click **Open Anyway** to allow it.
 
 1. Launch **`MCPBridge.pkg`**
-2. If `index.js` or `OllamaMCP.lua` weren't auto-detected, press **Browse** and select them manually - paths are saved automatically
-3. Exit MCPBridge, then launch Claude Code via Ollama:
+2. If `index.js` or `OllamaMCP.lua` weren't auto-detected, press **Browse** and select them manually
+3. Click **Apply Changes** — this writes a single `mcpbridge` entry to your `claude.json` and installs the Roblox plugin automatically
+4. **Roblox Studio:** click **Launch Studio** in the app, or open it manually
+5. **Blender:** select your install from the dropdown and click **Launch Blender**, then install the addon once (see [Blender Plugin Setup](#blender-plugin-setup))
+6. Exit MCPBridge, then launch Claude Code via Ollama:
    ```bash
    ollama launch claude --model minimax-m2.5:cloud
    ```
-4. Start giving Claude prompts for your Roblox game and watch it build!
+7. Start giving Claude prompts and watch it work!
 
 </details>
+
+---
+
+## 🔌 Blender Plugin Setup
+
+The Blender plugin is installed manually once directly inside Blender. You only need to do this the first time.
+
+1. Open Blender
+2. Go to **Edit → Preferences → Add-ons**
+3. Click **Install from Disk…**
+4. Select `MCPBridge/blender-plugin/MCPBridge.py` from the extracted source folder
+5. Enable **MCPBridge** in the add-ons list
+
+Once enabled, open any **3D Viewport**, open the **Sidebar** (`N` key), go to the **MCPBridge** tab, and click **Start Bridge**. The status indicator will turn green when connected.
+
+> [!NOTE]
+> The Blender plugin connects to `localhost:7843`. Make sure the MCPBridge MCP server is running (i.e. Claude Code has it active) before clicking Start Bridge.
 
 ---
 
@@ -152,25 +177,28 @@ npm install
 
 Add the MCP server to Claude Code's config. The config file lives at:
 
-| OS      | Path                           |
+| OS      | Path                          |
 |---------|-------------------------------|
-| macOS   | `~/.claude.json`               |
+| macOS   | `~/.claude.json`              |
 | Windows | `%USERPROFILE%\.claude.json`  |
 
-Add or merge this block (replace the path with your actual path):
+MCPBridge uses a **single unified server** that handles both Roblox and Blender. Add or merge this block (replace the path with your actual path):
 
 ```json
 {
   "mcpServers": {
-    "roblox-ollama": {
+    "mcpbridge": {
       "command": "node",
-      "args": ["/absolute/path/to/mcp-server/index.js"]
+      "args": ["/absolute/path/to/MCPBridge/mcp-server/index.js"]
     }
   }
 }
 ```
 
-Then restart Claude Code. You should see `roblox-ollama` in your MCP tools list.
+Then restart Claude Code. You should see `mcpbridge` in your MCP tools list with all Roblox and Blender tools available.
+
+> [!WARNING]
+> If you have old `roblox-ollama` or `blender-mcp` entries in your `claude.json` from a previous version, remove them. Having multiple entries pointing at the same `index.js` will cause both to fail (port conflict on `:7842`). The MCPBridge app's **Apply Changes** button handles this migration automatically.
 
 ### 2 - Install the Roblox Studio Plugin
 
@@ -186,7 +214,11 @@ Then restart Claude Code. You should see `roblox-ollama` in your MCP tools list.
 > 2. Click **... → Manage MCP Servers**
 > 3. Turn on **Enable Studio as MCP server**
 
-### 3 - Start Ollama
+### 3 - Install the Blender Plugin
+
+See [Blender Plugin Setup](#blender-plugin-setup) above.
+
+### 4 - Start Ollama
 
 Pick a model and launch it with Ollama. The bridge calls the REST API at `http://localhost:11434` automatically.
 
@@ -209,21 +241,22 @@ ollama launch claude --model qwen3-coder
 ollama launch claude --model gemma4
 ```
 
-### 4 - Connect everything
+### 5 - Connect everything
 
-1. In Roblox Studio, click **"MCP Bridge"** in the toolbar - widget shows 🟢 Connected
-2. Open Claude Code in your terminal
-3. Start asking Claude to work on your Roblox scripts!
+1. In Roblox Studio, click **"MCP Bridge"** in the toolbar — widget shows 🟢 Connected
+2. In Blender, open the **MCPBridge** sidebar tab and click **Start Bridge** — status shows 🟢 Connected
+3. Open Claude Code in your terminal
+4. Start asking Claude to work on your Roblox scripts or Blender scene!
 
 ---
 
 ## 🛠 Available MCP Tools
 
-### Studio Tools
+### Studio Tools (Roblox)
 
 | Tool | Description |
 |------|-------------|
-| `studio_status` | Check if plugin is connected |
+| `studio_status` | Check if the Roblox plugin is connected |
 | `studio_list_scripts` | List all scripts in the place |
 | `studio_read_script` | Read a script's source code |
 | `studio_write_script` | Overwrite a script's source |
@@ -232,6 +265,16 @@ ollama launch claude --model gemma4
 | `studio_get_output` | Get recent print/warn output |
 | `studio_get_workspace_info` | Get place metadata |
 | `studio_get_selection` | Get currently selected instances |
+
+### Blender Tools
+
+| Tool | Description |
+|------|-------------|
+| `blender_status` | Check if the Blender plugin is connected |
+| `blender_execute_python` | Execute Python (bpy) code in Blender |
+| `blender_get_scene_info` | Get scene objects, active object, render settings |
+| `blender_get_output` | Get recent output captured by the plugin |
+| `ollama_generate_python` | Generate Blender Python for a task, optionally execute it |
 
 ### Ollama Tools
 
@@ -245,6 +288,7 @@ ollama launch claude --model gemma4
 
 ## 💬 Example Prompts
 
+**Roblox Studio:**
 ```
 "List all scripts in my Roblox game"
 
@@ -257,16 +301,48 @@ ollama launch claude --model gemma4
 "Create a new LocalScript called 'UIHandler' in game.StarterPlayer.StarterPlayerScripts"
 ```
 
+**Blender:**
+```
+"What objects are in my Blender scene?"
+
+"Add a subdivided cube at the origin with 3 levels of subdivision"
+
+"Generate a Python script to create a low-poly tree and execute it in Blender"
+
+"Select all mesh objects in the scene and apply a smooth shading modifier"
+
+"What is the current render engine and frame range?"
+```
+
 ---
 
 ## 🔧 Troubleshooting
 
 <details>
-<summary><b>Plugin shows 🔴 Disconnected</b></summary>
+<summary><b>Roblox plugin shows 🔴 Disconnected</b></summary>
 
 - Make sure the MCP server is running (Claude Code must have it active)
 - Confirm HTTP requests are enabled in Studio Settings
 - Check that port `7842` isn't blocked by a firewall
+
+</details>
+
+<details>
+<summary><b>Blender plugin shows 🔴 Disconnected</b></summary>
+
+- Make sure the MCP server is running (Claude Code must have it active)
+- Check that port `7843` isn't blocked by a firewall
+- Confirm the MCPBridge addon is enabled in **Edit → Preferences → Add-ons**
+- Try clicking **Stop Bridge** then **Start Bridge** again in the sidebar
+
+</details>
+
+<details>
+<summary><b>Both plugins disconnected / MCP server won't start</b></summary>
+
+This is almost always caused by having duplicate entries in `claude.json` (e.g. old `roblox-ollama` and `blender-mcp` entries both pointing at `index.js`). Two Node processes fighting over port `7842` causes both to fail.
+
+**Fix:** Open MCPBridge, click **Apply Changes**. This replaces any old entries with a single `mcpbridge` entry. Then restart Claude Code.
 
 </details>
 
@@ -281,7 +357,7 @@ ollama launch claude --model gemma4
 <details>
 <summary><b>"Command timed out"</b></summary>
 
-- The plugin may have been deactivated - click the toolbar button again
+- The plugin may have been deactivated — click the toolbar/sidebar button again
 - Check the plugin widget for error messages
 
 </details>
@@ -313,10 +389,12 @@ On first launch, MCPBridge automatically extracts these folders next to the `.pk
 ```
 MCPBridge/
 ├── mcp-server/
-│   ├── index.js               ← MCP + HTTP bridge server
+│   ├── index.js               ← Unified MCP + HTTP bridge server (Roblox :7842, Blender :7843)
 │   └── package.json
 ├── roblox-plugin/
-│   └── OllamaMCP.lua          ← Studio plugin (auto-installed on Windows & macOS)
+│   └── OllamaMCP.lua          ← Roblox Studio plugin (auto-installed by MCPBridge app)
+├── blender-plugin/
+│   └── MCPBridge.py           ← Blender addon (install manually via Edit → Preferences)
 ├── MCPBridge.exe              ← Windows installer (double-click to run)
 ├── MCPBridge.pkg              ← macOS installer (double-click to run)
 ├── claude_mcp_config.json     ← Example Claude Code config snippet

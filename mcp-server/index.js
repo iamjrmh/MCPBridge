@@ -1,11 +1,16 @@
 /**
- * Roblox-Ollama MCP Bridge Server
- * ─────────────────────────────────
+ * MCPBridge — Unified Roblox + Blender MCP Server
+ * ─────────────────────────────────────────────────
  * Speaks MCP (stdio) to Claude Code while running an HTTP server
- * that the Roblox Studio plugin polls for commands.
+ * with two independent poll/result/state channels:
+ *
+ *   Port 7842  →  Roblox Studio plugin
+ *   Port 7843  →  Blender plugin
+ *
+ * Register ONE entry in claude.json:
+ *   "mcpbridge": { "command": "node", "args": ["<path>/index.js"] }
  *
  * Ollama model: minimax-m2.5:cloud
- * HTTP bridge port: 7842
  */
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -24,13 +29,14 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
-const BRIDGE_PORT = 7842;
+const ROBLOX_PORT = 7842;
+const BLENDER_PORT = 7843;
 const OLLAMA_BASE = "http://localhost:11434";
 const DEFAULT_MODEL = "minimax-m2.5:cloud";
 
-// Shared state
-const commandQueue = []; // Commands waiting to be picked up by plugin
-const resultStore = new Map(); // commandId → { result, error }
+// ── Roblox state ──
+const commandQueue = [];
+const resultStore = new Map();
 const studioState = {
   connected: false,
   lastSeen: null,
@@ -38,6 +44,21 @@ const studioState = {
   output: [],
   metadata: {},
 };
+
+// ── Blender state ──
+const blenderCommandQueue = [];
+const blenderResultStore = new Map();
+const blenderState = {
+  connected: false,
+  lastSeen: null,
+  objects: [],
+  output: [],
+  metadata: {},
+};
+
+// ─────────────────────────────────────────────
+// Roblox HTTP bridge (port 7842)
+// ─────────────────────────────────────────────
 
 // ── Roblox plugin polling endpoint ──
 app.get("/poll", (req, res) => {
@@ -72,7 +93,7 @@ app.post("/state", (req, res) => {
   res.json({ ok: true });
 });
 
-// ── Health check ──
+// ── Roblox health check ──
 app.get("/health", (_req, res) => {
   const connected =
     studioState.connected &&
@@ -86,9 +107,69 @@ app.get("/health", (_req, res) => {
   });
 });
 
-app.listen(BRIDGE_PORT, "127.0.0.1", () => {
+app.listen(ROBLOX_PORT, "127.0.0.1", () => {
   process.stderr.write(
-    `[MCP Bridge] HTTP server listening on http://127.0.0.1:${BRIDGE_PORT}\n`
+    `[MCPBridge] Roblox HTTP bridge listening on http://127.0.0.1:${ROBLOX_PORT}\n`
+  );
+});
+
+// ─────────────────────────────────────────────
+// Blender HTTP bridge (port 7843)
+// ─────────────────────────────────────────────
+const blenderApp = express();
+blenderApp.use(cors());
+blenderApp.use(express.json({ limit: "10mb" }));
+
+// ── Blender plugin polling endpoint ──
+blenderApp.get("/poll", (req, res) => {
+  blenderState.connected = true;
+  blenderState.lastSeen = Date.now();
+
+  if (blenderCommandQueue.length > 0) {
+    const cmd = blenderCommandQueue.shift();
+    res.json({ hasCommand: true, command: cmd });
+  } else {
+    res.json({ hasCommand: false });
+  }
+});
+
+// ── Blender plugin posts results here ──
+blenderApp.post("/result", (req, res) => {
+  const { commandId, result, error } = req.body;
+  if (commandId) {
+    blenderResultStore.set(commandId, { result, error, timestamp: Date.now() });
+  }
+  res.json({ ok: true });
+});
+
+// ── Blender plugin pushes state updates here ──
+blenderApp.post("/state", (req, res) => {
+  const { objects, output, metadata } = req.body;
+  if (Array.isArray(objects)) blenderState.objects = objects;
+  if (Array.isArray(output)) {
+    blenderState.output = [...blenderState.output, ...output].slice(-200);
+  }
+  if (metadata) blenderState.metadata = { ...blenderState.metadata, ...metadata };
+  res.json({ ok: true });
+});
+
+// ── Blender health check ──
+blenderApp.get("/health", (_req, res) => {
+  const connected =
+    blenderState.connected &&
+    blenderState.lastSeen &&
+    Date.now() - blenderState.lastSeen < 8000;
+  res.json({
+    bridge: "ok",
+    blenderConnected: connected,
+    lastSeen: blenderState.lastSeen,
+    queueLength: blenderCommandQueue.length,
+  });
+});
+
+blenderApp.listen(BLENDER_PORT, "127.0.0.1", () => {
+  process.stderr.write(
+    `[MCPBridge] Blender HTTP bridge listening on http://127.0.0.1:${BLENDER_PORT}\n`
   );
 });
 
@@ -111,11 +192,32 @@ async function sendToStudio(type, payload = {}, timeoutMs = 30_000) {
     }
     await sleep(150);
   }
-  // Remove stale command from queue
   const idx = commandQueue.findIndex((c) => c.id === commandId);
   if (idx !== -1) commandQueue.splice(idx, 1);
   throw new Error(
     "Command timed out — is the Roblox Studio plugin connected and active?"
+  );
+}
+
+/** Send a command to Blender and wait for the result. */
+async function sendToBlender(type, payload = {}, timeoutMs = 30_000) {
+  const commandId = `cmd_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+  blenderCommandQueue.push({ id: commandId, type, payload });
+
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if (blenderResultStore.has(commandId)) {
+      const r = blenderResultStore.get(commandId);
+      blenderResultStore.delete(commandId);
+      if (r.error) throw new Error(r.error);
+      return r.result;
+    }
+    await sleep(150);
+  }
+  const idx = blenderCommandQueue.findIndex((c) => c.id === commandId);
+  if (idx !== -1) blenderCommandQueue.splice(idx, 1);
+  throw new Error(
+    "Command timed out — is the Blender MCPBridge plugin connected and active?"
   );
 }
 
@@ -128,6 +230,14 @@ function isStudioConnected() {
     studioState.connected &&
     studioState.lastSeen &&
     Date.now() - studioState.lastSeen < 8000
+  );
+}
+
+function isBlenderConnected() {
+  return (
+    blenderState.connected &&
+    blenderState.lastSeen &&
+    Date.now() - blenderState.lastSeen < 8000
   );
 }
 
@@ -175,7 +285,7 @@ function stripCodeFences(text) {
 // MCP Server definition
 // ─────────────────────────────────────────────
 const server = new Server(
-  { name: "roblox-ollama-mcp", version: "1.0.0" },
+  { name: "mcpbridge", version: "1.0.0" },
   { capabilities: { tools: {} } }
 );
 
@@ -368,6 +478,76 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
         required: ["path"],
       },
     },
+
+    // ── Blender connection ──
+    {
+      name: "blender_status",
+      description: "Check whether the Blender MCPBridge plugin is connected.",
+      inputSchema: { type: "object", properties: {} },
+    },
+
+    // ── Blender execution ──
+    {
+      name: "blender_execute_python",
+      description: "Execute arbitrary Python code inside Blender via the MCPBridge plugin.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          code: { type: "string", description: "Python code to execute in Blender" },
+        },
+        required: ["code"],
+      },
+    },
+
+    // ── Blender scene info ──
+    {
+      name: "blender_get_scene_info",
+      description: "Get information about the current Blender scene: objects, active object, render settings, etc.",
+      inputSchema: { type: "object", properties: {} },
+    },
+
+    // ── Blender output ──
+    {
+      name: "blender_get_output",
+      description: "Get recent output/log lines captured by the Blender plugin.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          lines: {
+            type: "number",
+            description: "How many recent lines to return (default 50, max 200)",
+          },
+        },
+      },
+    },
+
+    // ── Ollama Python generation ──
+    {
+      name: "ollama_generate_python",
+      description: "Ask Ollama to write Blender Python (bpy) code, then optionally execute it in Blender.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          task: {
+            type: "string",
+            description: "Natural language description of what the Blender Python code should do",
+          },
+          existing_code: {
+            type: "string",
+            description: "Existing Python code to refactor or extend (optional)",
+          },
+          execute_in_blender: {
+            type: "boolean",
+            description: "If true, send the generated code to Blender for execution (default: false)",
+          },
+          model: {
+            type: "string",
+            description: `Model override (default: ${DEFAULT_MODEL})`,
+          },
+        },
+        required: ["task"],
+      },
+    },
   ],
 }));
 
@@ -534,6 +714,75 @@ Provide your review in these sections:
           DEFAULT_MODEL
         );
         return text(`# Code Review: ${args.path}\n\n${review}`);
+      }
+
+      // ──────────────── Blender connection ────────────────
+      case "blender_status": {
+        const connected = isBlenderConnected();
+        const age = blenderState.lastSeen
+          ? `${Math.round((Date.now() - blenderState.lastSeen) / 1000)}s ago`
+          : "never";
+        return text(
+          connected
+            ? `✅ Blender plugin is CONNECTED (last seen ${age})\nQueue: ${blenderCommandQueue.length} pending commands`
+            : `❌ Blender plugin is NOT connected (last seen ${age})\n\nMake sure you have:\n1. Installed the MCPBridge addon in Blender\n2. Enabled it in Edit → Preferences → Add-ons\n3. Clicked \"Start Bridge\" in the 3D Viewport sidebar → MCPBridge tab`
+        );
+      }
+
+      // ──────────────── Blender execution ────────────────
+      case "blender_execute_python": {
+        const result = await sendToBlender("execute", { code: args.code });
+        return text(
+          result !== undefined && result !== null
+            ? `Result: ${JSON.stringify(result, null, 2)}`
+            : "✅ Executed (no return value)"
+        );
+      }
+
+      // ──────────────── Blender scene info ────────────────
+      case "blender_get_scene_info": {
+        const info = await sendToBlender("scene_info", {});
+        return text(JSON.stringify(info, null, 2));
+      }
+
+      // ──────────────── Blender output ────────────────
+      case "blender_get_output": {
+        const n = Math.min(args.lines ?? 50, 200);
+        const lines = blenderState.output.slice(-n);
+        return text(
+          lines.length > 0
+            ? `Last ${lines.length} output lines:\n\n${lines.join("\n")}`
+            : "(No output captured yet — make sure the plugin is active)"
+        );
+      }
+
+      // ──────────────── Ollama Python generation ────────────────
+      case "ollama_generate_python": {
+        const contextBlock = args.existing_code
+          ? `\n\nExisting code to refactor/extend:\n\`\`\`python\n${args.existing_code}\n\`\`\``
+          : "";
+
+        const prompt = `You are an expert Blender Python developer. Write clean, correct Blender Python (bpy) code for the following task.
+
+Task: ${args.task}${contextBlock}
+
+Rules:
+- Use the bpy module correctly (bpy.ops, bpy.context, bpy.data)
+- Handle potential errors gracefully
+- Include brief inline comments for non-obvious logic
+- Respond with ONLY the Python code inside a single \`\`\`python ... \`\`\` block`;
+
+        const raw = await ollamaGenerate(prompt, args.model ?? DEFAULT_MODEL);
+        const fenceMatch = raw.match(/```(?:python)?\n?([\s\S]*?)\n?```/);
+        const code = fenceMatch ? fenceMatch[1].trim() : raw.trim();
+
+        let executeNote = "";
+        if (args.execute_in_blender) {
+          await sendToBlender("execute", { code });
+          executeNote = "\n\n✅ Executed in Blender";
+        }
+
+        return text(`Generated Python code:\n\`\`\`python\n${code}\n\`\`\`${executeNote}`);
       }
 
       default:
