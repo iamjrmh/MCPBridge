@@ -41,7 +41,7 @@ These steps are required regardless of your platform or install method.
 
 Click **Code → Download ZIP** at the top of this page and extract it somewhere on your machine.
 
-Then grab the installer for your platform from the [**Releases page**](https://github.com):
+Then grab the installer for your platform from the [**Releases page**](https://github.com/iamjrmh/MCPBridge/releases):
 
 <table>
 <tr>
