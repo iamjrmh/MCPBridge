@@ -3,6 +3,7 @@
 # MCPBridge
 
 **Connect Claude Code and Ollama to Roblox Studio and Blender via the Model Context Protocol**
+
 [![MCP Badge](https://lobehub.com/badge/mcp/iamjrmh-mcpbridge?style=flat)](https://lobehub.com/mcp/iamjrmh-mcpbridge)
 [![Windows](https://img.shields.io/badge/Windows-0078d4?logo=windows&logoColor=white)](https://github.com)
 [![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white)](https://github.com)
