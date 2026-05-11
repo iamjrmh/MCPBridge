@@ -3,7 +3,7 @@
 # MCPBridge
 
 **Connect Claude Code and Ollama to Roblox Studio and Blender via the Model Context Protocol**
-
+[![MCP Badge](https://lobehub.com/badge/mcp/iamjrmh-mcpbridge?style=flat)](https://lobehub.com/mcp/iamjrmh-mcpbridge)
 [![Windows](https://img.shields.io/badge/Windows-0078d4?logo=windows&logoColor=white)](https://github.com)
 [![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white)](https://github.com)
 [![Node.js](https://img.shields.io/badge/Node.js-v22_LTS-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
@@ -12,7 +12,6 @@
 [![Blender](https://img.shields.io/badge/Blender-orange?logo=blender&logoColor=white)](https://www.blender.org/)
 [![Roblox](https://img.shields.io/badge/Roblox-gray?logo=roblox&logoColor=white)](https://www.roblox.com/)
 [![MCP](https://img.shields.io/badge/Protocol-MCP-blueviolet)](https://modelcontextprotocol.io)
-[![MCP Badge](https://lobehub.com/badge/mcp-full/iamjrmh-mcpbridge)](https://lobehub.com/mcp/iamjrmh-mcpbridge)
 
 </div>
 
