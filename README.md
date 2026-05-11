@@ -14,6 +14,8 @@
 [![Roblox](https://img.shields.io/badge/Roblox-gray?logo=roblox&logoColor=white)](https://www.roblox.com/)
 [![MCP](https://img.shields.io/badge/Protocol-MCP-blueviolet)](https://modelcontextprotocol.io)
 
+[![MCP Badge](https://lobehub.com/badge/mcp-full/iamjrmh-mcpbridge)](https://lobehub.com/mcp/iamjrmh-mcpbridge)
+
 </div>
 
 ---
