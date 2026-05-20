@@ -422,7 +422,7 @@ MCPBridge/
 ├── MCPBridge.exe              ← Windows installer (double-click to run)
 ├── MCPBridge.pkg              ← macOS installer (double-click to run)
 ├── claude_mcp_config.json     ← Example Claude Code config snippet
-├── glama.json                 ← Glama MCP registry manifest
+├── server.json                ← Official MCP Registry manifest
 ├── skills.md                  ← Agent skill guide (also served as the mcpbridge://guide resource)
 ├── start.sh                   ← Helper startup script
 ├── LICENSE                    ← MIT license
