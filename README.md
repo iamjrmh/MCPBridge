@@ -10,6 +10,8 @@
 [![Ollama](https://img.shields.io/badge/Ollama-minimax--m2.5:cloud-black?logo=ollama&logoColor=white)](https://ollama.com)
 [![MCP](https://img.shields.io/badge/Protocol-MCP-blueviolet)](https://modelcontextprotocol.io)
 
+[![MCP Badge](https://lobehub.com/badge/mcp-full/iamjrmh-mcpbridge?theme=light)](https://lobehub.com/mcp/iamjrmh-mcpbridge)
+
 </div>
 
 ---
