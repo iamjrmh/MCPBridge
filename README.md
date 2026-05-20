@@ -9,6 +9,7 @@
 [![Node.js - v22 LTS](https://img.shields.io/badge/Node.js-v22_LTS-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
 [![Ollama](https://img.shields.io/badge/Ollama-minimax--m2.5:cloud-black?logo=ollama&logoColor=white)](https://ollama.com)
 [![MCP](https://img.shields.io/badge/Protocol-MCP-blueviolet)](https://modelcontextprotocol.io)
+[![npm](https://img.shields.io/npm/v/@iamjrmh/mcpbridge?logo=npm&color=cb3837)](https://www.npmjs.com/package/@iamjrmh/mcpbridge)
 
 [![MCP Badge](https://lobehub.com/badge/mcp-full/iamjrmh-mcpbridge?theme=light)](https://lobehub.com/mcp/iamjrmh-mcpbridge)
 
@@ -184,7 +185,22 @@ Add the MCP server to Claude Code's config. The config file lives at:
 | macOS   | `~/.claude.json`              |
 | Windows | `%USERPROFILE%\.claude.json`  |
 
-MCPBridge uses a **single unified server** that handles both Roblox and Blender. Add or merge this block (replace the path with your actual path):
+MCPBridge uses a **single unified server** that handles both Roblox and Blender. Add or merge one of the blocks below.
+
+**Option A - from npm (recommended).** No source download or `npm install` is needed for the server; `npx` fetches and runs it:
+
+```json
+{
+  "mcpServers": {
+    "mcpbridge": {
+      "command": "npx",
+      "args": ["-y", "@iamjrmh/mcpbridge"]
+    }
+  }
+}
+```
+
+**Option B - from local source.** Use this if you cloned the repo and want to run your own copy (replace the path with your actual path):
 
 ```json
 {
@@ -198,6 +214,9 @@ MCPBridge uses a **single unified server** that handles both Roblox and Blender.
 ```
 
 Then restart Claude Code. You should see `mcpbridge` in your MCP tools list with all Roblox and Blender tools available.
+
+> [!NOTE]
+> The npm package [`@iamjrmh/mcpbridge`](https://www.npmjs.com/package/@iamjrmh/mcpbridge) contains the MCP server only. You still need the source's `roblox-plugin/` and `blender-plugin/` files to install the Studio and Blender plugins.
 
 > [!WARNING]
 > If you have old `roblox-ollama` or `blender-mcp` entries in your `claude.json` from a previous version, remove them. Having multiple entries pointing at the same `index.js` will cause both to fail (port conflict on `:7842`). The MCPBridge app's **Apply Changes** button handles this migration automatically.
