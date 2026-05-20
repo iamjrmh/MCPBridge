@@ -4,17 +4,11 @@
 
 **Connect Claude Code and Ollama to Roblox Studio and Blender via the Model Context Protocol**
 
-[![MCP Badge](https://lobehub.com/badge/mcp/iamjrmh-mcpbridge?style=flat)](https://lobehub.com/mcp/iamjrmh-mcpbridge)
-[![Windows](https://img.shields.io/badge/Windows-0078d4?logo=windows&logoColor=white)](https://github.com)
-[![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white)](https://github.com)
-[![Node.js](https://img.shields.io/badge/Node.js-v22_LTS-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
-[![Ollama](https://img.shields.io/badge/Ollama-black?logo=ollama&logoColor=white)](https://ollama.com)
-[![Claude Code](https://img.shields.io/badge/Claude-orange?logo=claude&logoColor=white)](https://code.claude.com/docs/en/overview)
-[![Blender](https://img.shields.io/badge/Blender-orange?logo=blender&logoColor=white)](https://www.blender.org/)
-[![Roblox](https://img.shields.io/badge/Roblox-gray?logo=roblox&logoColor=white)](https://www.roblox.com/)
+[![Platform - Windows](https://img.shields.io/badge/platform-Windows-0078d4?logo=windows&logoColor=white)](https://github.com)
+[![Platform - macOS](https://img.shields.io/badge/platform-macOS-000000?logo=apple&logoColor=white)](https://github.com)
+[![Node.js - v22 LTS](https://img.shields.io/badge/Node.js-v22_LTS-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
+[![Ollama](https://img.shields.io/badge/Ollama-minimax--m2.5:cloud-black?logo=ollama&logoColor=white)](https://ollama.com)
 [![MCP](https://img.shields.io/badge/Protocol-MCP-blueviolet)](https://modelcontextprotocol.io)
-
-[![MCP Badge](https://lobehub.com/badge/mcp-full/iamjrmh-mcpbridge)](https://lobehub.com/mcp/iamjrmh-mcpbridge)
 
 </div>
 
@@ -41,7 +35,7 @@ These steps are required regardless of your platform or install method.
 
 Click **Code → Download ZIP** at the top of this page and extract it somewhere on your machine.
 
-Then grab the installer for your platform from the [**Releases page**](https://github.com/iamjrmh/MCPBridge/releases):
+Then grab the installer for your platform from the [**Releases page**](https://github.com):
 
 <table>
 <tr>
@@ -290,6 +284,30 @@ ollama launch claude --model gemma4
 | `ollama_generate_lua` | Generate Roblox Lua for a task, optionally write to Studio |
 | `ollama_review_script` | Review a script for bugs and performance issues |
 
+### Prompts
+
+Reusable, parameterised workflows exposed over MCP — invoke them from any MCP client.
+
+| Prompt | Arguments | Purpose |
+|--------|-----------|---------|
+| `roblox_build_feature` | `feature`, `location?` | Plan and implement a Roblox feature end-to-end |
+| `roblox_debug_script` | `script_path`, `symptom?` | Diagnose and fix a misbehaving script |
+| `roblox_review_script` | `script_path`, `focus?` | Review a script for bugs and performance |
+| `blender_build_scene` | `description` | Plan and build a Blender scene with `bpy` |
+
+### Resources
+
+Readable context data exposed over MCP — attach them to a conversation for live state.
+
+| Resource URI | Description |
+|--------------|-------------|
+| `mcpbridge://guide` | Agent skill guide (`skills.md`) — tools, workflows, rules |
+| `mcpbridge://server/info` | Server version, ports, default model, capability counts |
+| `mcpbridge://studio/status` | Live Roblox Studio connection state |
+| `mcpbridge://studio/output` | Recent Roblox Studio output log |
+| `mcpbridge://blender/status` | Live Blender connection state |
+| `mcpbridge://blender/output` | Recent Blender output log |
+
 ---
 
 ## 💬 Example Prompts
@@ -404,6 +422,15 @@ MCPBridge/
 ├── MCPBridge.exe              ← Windows installer (double-click to run)
 ├── MCPBridge.pkg              ← macOS installer (double-click to run)
 ├── claude_mcp_config.json     ← Example Claude Code config snippet
+├── glama.json                 ← Glama MCP registry manifest
+├── skills.md                  ← Agent skill guide (also served as the mcpbridge://guide resource)
 ├── start.sh                   ← Helper startup script
+├── LICENSE                    ← MIT license
 └── README.md
 ```
+
+---
+
+## 📄 License
+
+MCPBridge is released under the [MIT License](LICENSE).

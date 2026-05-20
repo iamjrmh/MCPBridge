@@ -1,8 +1,8 @@
 {
   "mcpServers": {
-    "roblox-ollama": {
+    "mcpbridge": {
       "command": "node",
-      "args": ["/ABSOLUTE/PATH/TO/roblox-ollama-mcp/mcp-server/index.js"],
+      "args": ["/ABSOLUTE/PATH/TO/MCPBridge/mcp-server/index.js"],
       "env": {}
     }
   }
