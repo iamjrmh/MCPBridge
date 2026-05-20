@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /**
  * MCPBridge — Unified Roblox + Blender MCP Server
  * ─────────────────────────────────────────────────
@@ -18,9 +19,16 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
+  ListPromptsRequestSchema,
+  GetPromptRequestSchema,
+  ListResourcesRequestSchema,
+  ReadResourceRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import express from "express";
 import cors from "cors";
+import { readFileSync } from "fs";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
 
 // ─────────────────────────────────────────────
 // HTTP bridge server (for Roblox Studio plugin)
@@ -107,9 +115,15 @@ app.get("/health", (_req, res) => {
   });
 });
 
-app.listen(ROBLOX_PORT, "127.0.0.1", () => {
+const robloxBridge = app.listen(ROBLOX_PORT, "127.0.0.1", () => {
   process.stderr.write(
     `[MCPBridge] Roblox HTTP bridge listening on http://127.0.0.1:${ROBLOX_PORT}\n`
+  );
+});
+// A port conflict must not take down the MCP server — log and keep going.
+robloxBridge.on("error", (e) => {
+  process.stderr.write(
+    `[MCPBridge] Roblox HTTP bridge could not bind :${ROBLOX_PORT} — ${e.message}\n`
   );
 });
 
@@ -167,9 +181,15 @@ blenderApp.get("/health", (_req, res) => {
   });
 });
 
-blenderApp.listen(BLENDER_PORT, "127.0.0.1", () => {
+const blenderBridge = blenderApp.listen(BLENDER_PORT, "127.0.0.1", () => {
   process.stderr.write(
     `[MCPBridge] Blender HTTP bridge listening on http://127.0.0.1:${BLENDER_PORT}\n`
+  );
+});
+// A port conflict must not take down the MCP server — log and keep going.
+blenderBridge.on("error", (e) => {
+  process.stderr.write(
+    `[MCPBridge] Blender HTTP bridge could not bind :${BLENDER_PORT} — ${e.message}\n`
   );
 });
 
@@ -286,7 +306,7 @@ function stripCodeFences(text) {
 // ─────────────────────────────────────────────
 const server = new Server(
   { name: "mcpbridge", version: "1.0.0" },
-  { capabilities: { tools: {} } }
+  { capabilities: { tools: {}, prompts: {}, resources: {} } }
 );
 
 // ── Tool list ──
@@ -790,6 +810,266 @@ Rules:
     }
   } catch (e) {
     return err(e.message ?? String(e));
+  }
+});
+
+// ─────────────────────────────────────────────
+// MCP Prompts — reusable, parameterised workflows
+// ─────────────────────────────────────────────
+const PROMPTS = [
+  {
+    name: "roblox_build_feature",
+    description:
+      "Plan and implement a Roblox Studio feature end-to-end using the studio_* tools.",
+    arguments: [
+      {
+        name: "feature",
+        description: "What the feature should do, in plain language.",
+        required: true,
+      },
+      {
+        name: "location",
+        description:
+          'Where the script should live, e.g. "game.ServerScriptService".',
+        required: false,
+      },
+    ],
+  },
+  {
+    name: "roblox_debug_script",
+    description:
+      "Diagnose and fix a misbehaving Roblox script using the read/output tools.",
+    arguments: [
+      {
+        name: "script_path",
+        description: 'Full path, e.g. "game.ServerScriptService.GameManager".',
+        required: true,
+      },
+      {
+        name: "symptom",
+        description: "What is going wrong (error text or observed behaviour).",
+        required: false,
+      },
+    ],
+  },
+  {
+    name: "roblox_review_script",
+    description:
+      "Review a Roblox script for bugs, performance issues, and deprecated APIs.",
+    arguments: [
+      {
+        name: "script_path",
+        description: "Full path of the script to review.",
+        required: true,
+      },
+      {
+        name: "focus",
+        description: 'Optional emphasis, e.g. "performance" or "security".',
+        required: false,
+      },
+    ],
+  },
+  {
+    name: "blender_build_scene",
+    description:
+      "Plan and build a Blender scene with bpy using the blender_* tools.",
+    arguments: [
+      {
+        name: "description",
+        description: "What the scene or model should contain.",
+        required: true,
+      },
+    ],
+  },
+];
+
+/** Wrap prompt text as a single user message. */
+function userMessage(text) {
+  return { messages: [{ role: "user", content: { type: "text", text } }] };
+}
+
+server.setRequestHandler(ListPromptsRequestSchema, async () => ({
+  prompts: PROMPTS,
+}));
+
+server.setRequestHandler(GetPromptRequestSchema, async (request) => {
+  const { name, arguments: args = {} } = request.params;
+
+  switch (name) {
+    case "roblox_build_feature":
+      return {
+        description: "Build a Roblox feature end-to-end.",
+        ...userMessage(
+          `Build this Roblox Studio feature: ${args.feature ?? "(unspecified)"}\n\n` +
+            `Place the code in ${args.location || "an appropriate service"}.\n\n` +
+            `Steps:\n` +
+            `1. studio_status — confirm the plugin is connected.\n` +
+            `2. studio_list_scripts — see what already exists.\n` +
+            `3. Write modern Luau (game:GetService, task.wait — never wait()/spawn()/delay()).\n` +
+            `4. studio_create_script / studio_write_script to apply the code.\n` +
+            `5. studio_get_output — check for errors and fix any that appear.`
+        ),
+      };
+
+    case "roblox_debug_script":
+      return {
+        description: "Debug a Roblox script.",
+        ...userMessage(
+          `Debug the Roblox script at ${args.script_path ?? "(unspecified)"}.\n\n` +
+            (args.symptom ? `Reported symptom: ${args.symptom}\n\n` : "") +
+            `Steps:\n` +
+            `1. studio_read_script — read the current source.\n` +
+            `2. studio_get_output — see recent errors/warnings.\n` +
+            `3. Identify the root cause; do not patch symptoms.\n` +
+            `4. studio_write_script — apply the corrected source.\n` +
+            `5. studio_get_output — confirm the error is gone.`
+        ),
+      };
+
+    case "roblox_review_script":
+      return {
+        description: "Review a Roblox script.",
+        ...userMessage(
+          `Review the Roblox script at ${args.script_path ?? "(unspecified)"}. ` +
+            (args.focus
+              ? `Focus on: ${args.focus}.`
+              : "Cover bugs, performance, deprecated APIs, and style.") +
+            `\n\nRead it with studio_read_script (or use the ollama_review_script ` +
+            `tool), then report a one-line summary, issues by severity, and concrete fixes.`
+        ),
+      };
+
+    case "blender_build_scene":
+      return {
+        description: "Build a Blender scene.",
+        ...userMessage(
+          `Build this in Blender: ${args.description ?? "(unspecified)"}\n\n` +
+            `Steps:\n` +
+            `1. blender_status — confirm the plugin is connected.\n` +
+            `2. blender_get_scene_info — see what already exists.\n` +
+            `3. blender_execute_python — run correct bpy code to build it.\n` +
+            `4. blender_get_output — check for tracebacks and fix any.`
+        ),
+      };
+
+    default:
+      throw new Error(`Unknown prompt: ${name}`);
+  }
+});
+
+// ─────────────────────────────────────────────
+// MCP Resources — readable context data
+// ─────────────────────────────────────────────
+const guidePath = join(dirname(fileURLToPath(import.meta.url)), "..", "skills.md");
+
+const RESOURCES = [
+  {
+    uri: "mcpbridge://guide",
+    name: "MCPBridge agent skill guide",
+    description:
+      "How agents should drive MCPBridge — tools, workflows, and golden rules.",
+    mimeType: "text/markdown",
+  },
+  {
+    uri: "mcpbridge://server/info",
+    name: "MCPBridge server info",
+    description: "Server version, ports, default model, and capability counts.",
+    mimeType: "application/json",
+  },
+  {
+    uri: "mcpbridge://studio/status",
+    name: "Roblox Studio connection status",
+    description: "Live connection state of the Roblox Studio plugin.",
+    mimeType: "application/json",
+  },
+  {
+    uri: "mcpbridge://studio/output",
+    name: "Roblox Studio output log",
+    description: "Recent print/warn/error lines captured from Roblox Studio.",
+    mimeType: "text/plain",
+  },
+  {
+    uri: "mcpbridge://blender/status",
+    name: "Blender connection status",
+    description: "Live connection state of the Blender plugin.",
+    mimeType: "application/json",
+  },
+  {
+    uri: "mcpbridge://blender/output",
+    name: "Blender output log",
+    description: "Recent log lines captured from Blender.",
+    mimeType: "text/plain",
+  },
+];
+
+server.setRequestHandler(ListResourcesRequestSchema, async () => ({
+  resources: RESOURCES,
+}));
+
+server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
+  const { uri } = request.params;
+
+  const json = (obj) => ({
+    contents: [
+      { uri, mimeType: "application/json", text: JSON.stringify(obj, null, 2) },
+    ],
+  });
+  const body = (txt, mimeType = "text/plain") => ({
+    contents: [{ uri, mimeType, text: txt }],
+  });
+
+  switch (uri) {
+    case "mcpbridge://guide":
+      try {
+        return body(readFileSync(guidePath, "utf8"), "text/markdown");
+      } catch {
+        return body(
+          "Agent skill guide unavailable — see skills.md in the MCPBridge repository.",
+          "text/markdown"
+        );
+      }
+
+    case "mcpbridge://server/info":
+      return json({
+        name: "mcpbridge",
+        version: "1.0.0",
+        robloxPort: ROBLOX_PORT,
+        blenderPort: BLENDER_PORT,
+        ollamaBase: OLLAMA_BASE,
+        defaultModel: DEFAULT_MODEL,
+        tools: 17,
+        prompts: PROMPTS.length,
+        resources: RESOURCES.length,
+      });
+
+    case "mcpbridge://studio/status":
+      return json({
+        connected: isStudioConnected(),
+        lastSeen: studioState.lastSeen,
+        queueLength: commandQueue.length,
+        scriptCount: studioState.scripts.length,
+      });
+
+    case "mcpbridge://studio/output":
+      return body(
+        studioState.output.slice(-200).join("\n") || "(no output captured yet)"
+      );
+
+    case "mcpbridge://blender/status":
+      return json({
+        connected: isBlenderConnected(),
+        lastSeen: blenderState.lastSeen,
+        queueLength: blenderCommandQueue.length,
+        objectCount: blenderState.objects.length,
+      });
+
+    case "mcpbridge://blender/output":
+      return body(
+        blenderState.output.slice(-200).join("\n") || "(no output captured yet)"
+      );
+
+    default:
+      throw new Error(`Unknown resource: ${uri}`);
   }
 });
 

@@ -1,16 +1,49 @@
 {
-  "name": "roblox-ollama-mcp",
+  "name": "@iamjrmh/mcpbridge",
   "version": "1.0.0",
-  "description": "MCP bridge between Claude Code, Ollama, and Roblox Studio",
+  "description": "Unified MCP server bridging Claude Code and Ollama to Roblox Studio and Blender.",
+  "mcpName": "io.github.iamjrmh/mcpbridge",
   "type": "module",
   "main": "index.js",
+  "bin": {
+    "mcpbridge": "index.js"
+  },
+  "files": [
+    "index.js"
+  ],
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js"
   },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "roblox",
+    "roblox-studio",
+    "blender",
+    "ollama",
+    "claude",
+    "claude-code"
+  ],
+  "author": "iamjrmh",
+  "license": "MIT",
+  "homepage": "https://github.com/iamjrmh/MCPBridge#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iamjrmh/MCPBridge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/iamjrmh/MCPBridge/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.10.2",
-    "express": "^4.21.2",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
   }
 }
