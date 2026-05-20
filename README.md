@@ -122,7 +122,7 @@ npm install
 
 1. Launch **`MCPBridge.exe`**
 2. If `index.js` or `OllamaMCP.lua` weren't auto-detected, press **Browse** and select them manually
-3. Click **Apply Changes** — this writes a single `mcpbridge` entry to your `claude.json` and installs the Roblox plugin automatically
+3. Click **Apply Changes** - this writes a single `mcpbridge` entry to your `claude.json` and installs the Roblox plugin automatically
 4. **Roblox Studio:** click **Launch Studio** in the app, or open it manually
 5. **Blender:** select your install from the dropdown and click **Launch Blender**, then install the addon once (see [Blender Plugin Setup](#blender-plugin-setup))
 6. Exit MCPBridge, then launch Claude Code via Ollama:
@@ -141,7 +141,7 @@ npm install
 
 1. Launch **`MCPBridge.pkg`**
 2. If `index.js` or `OllamaMCP.lua` weren't auto-detected, press **Browse** and select them manually
-3. Click **Apply Changes** — this writes a single `mcpbridge` entry to your `claude.json` and installs the Roblox plugin automatically
+3. Click **Apply Changes** - this writes a single `mcpbridge` entry to your `claude.json` and installs the Roblox plugin automatically
 4. **Roblox Studio:** click **Launch Studio** in the app, or open it manually
 5. **Blender:** select your install from the dropdown and click **Launch Blender**, then install the addon once (see [Blender Plugin Setup](#blender-plugin-setup))
 6. Exit MCPBridge, then launch Claude Code via Ollama:
@@ -243,8 +243,8 @@ ollama launch claude --model gemma4
 
 ### 5 - Connect everything
 
-1. In Roblox Studio, click **"MCP Bridge"** in the toolbar — widget shows 🟢 Connected
-2. In Blender, open the **MCPBridge** sidebar tab and click **Start Bridge** — status shows 🟢 Connected
+1. In Roblox Studio, click **"MCP Bridge"** in the toolbar - widget shows 🟢 Connected
+2. In Blender, open the **MCPBridge** sidebar tab and click **Start Bridge** - status shows 🟢 Connected
 3. Open Claude Code in your terminal
 4. Start asking Claude to work on your Roblox scripts or Blender scene!
 
@@ -286,7 +286,7 @@ ollama launch claude --model gemma4
 
 ### Prompts
 
-Reusable, parameterised workflows exposed over MCP — invoke them from any MCP client.
+Reusable, parameterised workflows exposed over MCP - invoke them from any MCP client.
 
 | Prompt | Arguments | Purpose |
 |--------|-----------|---------|
@@ -297,11 +297,11 @@ Reusable, parameterised workflows exposed over MCP — invoke them from any MCP 
 
 ### Resources
 
-Readable context data exposed over MCP — attach them to a conversation for live state.
+Readable context data exposed over MCP - attach them to a conversation for live state.
 
 | Resource URI | Description |
 |--------------|-------------|
-| `mcpbridge://guide` | Agent skill guide (`skills.md`) — tools, workflows, rules |
+| `mcpbridge://guide` | Agent skill guide (`skills.md`) - tools, workflows, rules |
 | `mcpbridge://server/info` | Server version, ports, default model, capability counts |
 | `mcpbridge://studio/status` | Live Roblox Studio connection state |
 | `mcpbridge://studio/output` | Recent Roblox Studio output log |
@@ -381,7 +381,7 @@ This is almost always caused by having duplicate entries in `claude.json` (e.g. 
 <details>
 <summary><b>"Command timed out"</b></summary>
 
-- The plugin may have been deactivated — click the toolbar/sidebar button again
+- The plugin may have been deactivated - click the toolbar/sidebar button again
 - Check the plugin widget for error messages
 
 </details>
