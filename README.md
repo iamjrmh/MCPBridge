@@ -5,7 +5,7 @@
 **Connect Claude Code and Ollama to Roblox Studio and Blender via the Model Context Protocol**
 
 [![Platform - Windows](https://img.shields.io/badge/platform-Windows-0078d4?logo=windows&logoColor=white)](https://github.com)
-[![Platform - macOS](https://img.shields.io/badge/platform-macOS-000000?logo=apple&logoColor=white)](https://github.com)
+[![Platform - macOS](https://img.shields.io/badge/platform-macOS_(manual_setup)-000000?logo=apple&logoColor=white)](#-manual-setup)
 [![Node.js - 18+](https://img.shields.io/badge/Node.js-18%2B-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org)
 [![Ollama](https://img.shields.io/badge/Ollama-minimax--m2.5:cloud-black?logo=ollama&logoColor=white)](https://ollama.com)
 [![MCP](https://img.shields.io/badge/Protocol-MCP-blueviolet)](https://modelcontextprotocol.io)
@@ -38,26 +38,10 @@ These steps are required regardless of your platform or install method.
 
 Click **Code → Download ZIP** at the top of this page and extract it somewhere on your machine.
 
-Then grab the installer for your platform from the [**Releases page**](https://github.com):
+The ZIP includes **`MCPBridge.exe`**, the Windows setup app, in the top folder. Leave it where it is:
+it finds `mcp-server/index.js` and `roblox-plugin/OllamaMCP.lua` next to itself.
 
-<table>
-<tr>
-<td align="center" width="50%">
-<a href="https://github.com/iamjrmh/MCPBridge/releases/latest/download/MCPBridge.exe">
-<img src="https://img.shields.io/badge/Download-MCPBridge.exe-0078d4?style=for-the-badge&logo=windows&logoColor=white" alt="Download MCPBridge.exe"/>
-</a><br/>
-<sub>Windows Installer</sub>
-</td>
-<td align="center" width="50%">
-<a href="https://github.com/iamjrmh/MCPBridge/releases/latest/download/MCPBridge.pkg">
-<img src="https://img.shields.io/badge/Download-MCPBridge.pkg-000000?style=for-the-badge&logo=apple&logoColor=white" alt="Download MCPBridge.pkg"/>
-</a><br/>
-<sub>macOS Installer</sub>
-</td>
-</tr>
-</table>
-
-Place the installer in the same folder as the extracted source before continuing.
+On macOS there is no setup app at the moment: follow [Manual Setup](#-manual-setup) below (two small steps).
 
 ### 2 - Install Node.js via NVM
 
@@ -123,7 +107,7 @@ node mcp-server/index.js
 <details>
 <summary><b>🪟 Windows</b> <img src="https://img.shields.io/badge/Recommended-0078d4?logo=windows&logoColor=white" alt="Recommended" height="20"/></summary>
 
-1. Launch **`MCPBridge.exe`**
+1. Launch **`MCPBridge.exe`** from the extracted folder
 2. If `index.js` or `OllamaMCP.lua` weren't auto-detected, press **Browse** and select them manually
 3. Click **Apply Changes** - this writes a single `mcpbridge` entry to your `claude.json` and installs the Roblox plugin automatically
 4. **Roblox Studio:** click **Launch Studio** in the app, or open it manually
@@ -137,21 +121,10 @@ node mcp-server/index.js
 </details>
 
 <details>
-<summary><b>🍎 macOS</b> <img src="https://img.shields.io/badge/Recommended-000000?logo=apple&logoColor=white" alt="Recommended" height="20"/></summary>
+<summary><b>🍎 macOS</b></summary>
 
-> [!NOTE]
-> On first launch macOS may show a security warning. Go to **System Settings → Privacy & Security** and click **Open Anyway** to allow it.
-
-1. Launch **`MCPBridge.pkg`**
-2. If `index.js` or `OllamaMCP.lua` weren't auto-detected, press **Browse** and select them manually
-3. Click **Apply Changes** - this writes a single `mcpbridge` entry to your `claude.json` and installs the Roblox plugin automatically
-4. **Roblox Studio:** click **Launch Studio** in the app, or open it manually
-5. **Blender:** select your install from the dropdown and click **Launch Blender**, then install the addon once (see [Blender Plugin Setup](#blender-plugin-setup))
-6. Exit MCPBridge, then launch Claude Code via Ollama:
-   ```bash
-   ollama launch claude --model minimax-m2.5:cloud
-   ```
-7. Start giving Claude prompts and watch it work!
+There is no macOS setup app at the moment. Use [Manual Setup](#-manual-setup): add the `mcpbridge`
+entry to `~/.claude.json` and copy `OllamaMCP.lua` into Studio's plugins folder.
 
 </details>
 
@@ -457,26 +430,6 @@ leftover `roblox-ollama` / `blender-mcp` entries from `claude.json`; the MCPBrid
 
 </details>
 
-<details>
-<summary><b>🍎 macOS - "App can't be opened" security warning</b></summary>
-
-macOS may block the installer on first launch since it isn't notarized. To allow it:
-
-1. Go to **System Settings → Privacy & Security**
-2. Scroll down and click **Open Anyway** next to MCPBridge
-3. Confirm in the dialog that appears
-
-Alternatively, right-click the `.pkg` and choose **Open** to bypass the warning directly.
-
-</details>
-
-<details>
-<summary><b>🍎 macOS - mcp-server or roblox-plugin folder not found</b></summary>
-
-On first launch, MCPBridge automatically extracts these folders next to the `.pkg`. If auto-detection still fails, use the **Browse** button in the app to point to them manually. The folders will be located next to `MCPBridge.pkg` in the same directory.
-
-</details>
-
 ---
 
 ## 📁 File Structure
@@ -491,8 +444,7 @@ MCPBridge/
 │   └── OllamaMCP.lua          ← Roblox Studio plugin (auto-installed by MCPBridge app)
 ├── blender-plugin/
 │   └── MCPBridge.py           ← Blender addon (install manually via Edit → Preferences)
-├── MCPBridge.exe              ← Windows installer (double-click to run)
-├── MCPBridge.pkg              ← macOS installer (double-click to run)
+├── MCPBridge.exe              ← Windows setup app (double-click to run)
 ├── claude_mcp_config.json     ← Example Claude Code config snippet
 ├── server.json                ← Official MCP Registry manifest
 ├── skills.md                  ← Agent skill guide (also served as the mcpbridge://guide resource)
