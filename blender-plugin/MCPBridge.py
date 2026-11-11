@@ -18,7 +18,7 @@ REQUIREMENTS:
 bl_info = {
     "name":        "MCPBridge",
     "author":      "MCPBridge",
-    "version":     (1, 0, 0),
+    "version":     (1, 1, 0),
     "blender":     (3, 0, 0),
     "location":    "View3D › Sidebar › MCPBridge",
     "description": "Connects Blender to the MCPBridge MCP server (Claude Code / Ollama)",
@@ -27,6 +27,9 @@ bl_info = {
 
 import bpy
 import json
+import ast
+import contextlib
+import io
 import queue
 import threading
 import time
@@ -41,7 +44,8 @@ from datetime import datetime
 SERVER   = "http://127.0.0.1:7843"
 POLL_HZ  = 2        # polls per second
 HEARTBEAT = 5       # seconds between state pushes
-VERSION  = "1.0.0"
+VERSION  = "1.1.0"
+MAX_OUTPUT_LINES = 400   # printed lines kept between pushes
 
 
 # ── Global state ────────────────────────────────────────────────────────────
@@ -98,11 +102,78 @@ def _collect_scripts() -> list:
 
 # ── Command handlers  (all called on the main thread) ───────────────────────
 
+def _jsonable(value, depth=0):
+    """Turn any Blender/Python value into something json.dumps accepts."""
+    if value is None or isinstance(value, (bool, int, float, str)):
+        return value
+    if depth >= 8:
+        return repr(value)
+    if isinstance(value, dict):
+        return {str(k): _jsonable(v, depth + 1) for k, v in value.items()}
+    if isinstance(value, (list, tuple, set, frozenset)):
+        return [_jsonable(v, depth + 1) for v in value]
+    if isinstance(value, bpy.types.ID):
+        return f"{type(value).__name__}:{value.name}"
+    try:
+        # Vector, Color, Euler, Quaternion, Matrix and bpy arrays are sequences.
+        return [_jsonable(v, depth + 1) for v in value]
+    except TypeError:
+        return repr(value)
+
+
 def _handle_execute(payload: dict):
+    """Run code; return the last expression (or __result__), what it printed, and any error."""
     code = payload.get("code", "")
-    ns = {"bpy": bpy, "__result__": None}
-    exec(compile(code, "<mcp_execute>", "exec"), ns)  # noqa: S102
-    return ns.get("__result__")
+    ns = {"bpy": bpy, "__name__": "__mcp__", "__result__": None}
+    printed = io.StringIO()
+    try:
+        tree = ast.parse(code, "<mcp_execute>", "exec")
+        last = None
+        if tree.body and isinstance(tree.body[-1], ast.Expr):
+            last = ast.Expression(tree.body.pop().value)
+            ast.fix_missing_locations(last)
+        with contextlib.redirect_stdout(printed), contextlib.redirect_stderr(printed):
+            exec(compile(tree, "<mcp_execute>", "exec"), ns)  # noqa: S102
+            value = eval(compile(last, "<mcp_execute>", "eval"), ns) if last is not None else None  # noqa: S307
+        if ns.get("__result__") is not None:
+            value = ns["__result__"]
+        result = {"ok": True, "values": [] if value is None else [_jsonable(value)]}
+    except BaseException:  # noqa: BLE001 - the agent has to see every failure, SystemExit included
+        result = {"ok": False, "error": traceback.format_exc()}
+    lines = printed.getvalue().splitlines()
+    result["output"] = lines[-MAX_OUTPUT_LINES:]
+    _log_buffer.extend(lines)
+    del _log_buffer[:-MAX_OUTPUT_LINES]
+    return result
+
+
+def _handle_object_info(payload: dict):
+    name = payload.get("name", "")
+    obj = bpy.data.objects.get(name)
+    if obj is None:
+        raise KeyError(f"No object named '{name}'. Objects: {', '.join(o.name for o in bpy.data.objects[:40])}")
+    info = {
+        "name":       obj.name,
+        "type":       obj.type,
+        "location":   list(obj.location),
+        "rotation":   list(obj.rotation_euler),
+        "scale":      list(obj.scale),
+        "dimensions": list(obj.dimensions),
+        "visible":    obj.visible_get(),
+        "parent":     obj.parent.name if obj.parent else None,
+        "children":   [c.name for c in obj.children],
+        "collections": [c.name for c in obj.users_collection],
+        "materials":  [s.material.name for s in obj.material_slots if s.material],
+        "modifiers":  [{"name": m.name, "type": m.type} for m in obj.modifiers],
+        "customProperties": {k: _jsonable(v) for k, v in obj.items()},
+    }
+    if obj.type == "MESH" and obj.data is not None:
+        mesh = obj.data
+        info["mesh"] = {
+            "vertices": len(mesh.vertices), "edges": len(mesh.edges), "polygons": len(mesh.polygons),
+            "uvLayers": [uv.name for uv in mesh.uv_layers],
+        }
+    return info
 
 
 def _handle_list_scripts(_payload: dict):
@@ -183,6 +254,7 @@ _HANDLERS = {
     "create_script":  _handle_create_script,
     "workspace_info": _handle_workspace_info,
     "scene_info":     _handle_scene_info,
+    "object_info":    _handle_object_info,
     "get_selection":  _handle_get_selection,
 }
 
@@ -204,12 +276,12 @@ def _process_command(command: dict):
         body = json.dumps({
             "commandId": cmd_id,
             "result":    None,
-            "error":     f"Unknown command type: {cmd_type}",
+            "error":     f"This add-on (v{VERSION}) does not know '{cmd_type}'. Install the newest blender-plugin/MCPBridge.py.",
         })
     else:
         try:
             result = handler(payload)
-            body   = json.dumps({"commandId": cmd_id, "result": result, "error": None})
+            body   = json.dumps({"commandId": cmd_id, "result": _jsonable(result), "error": None})
         except Exception as exc:
             _append_log(f"✗ {exc}")
             body = json.dumps({
@@ -272,7 +344,7 @@ def _poll_loop():
     """Background thread: hits /poll, queues commands for the main thread."""
     while _active:
         try:
-            with urllib.request.urlopen(SERVER + "/poll", timeout=5) as resp:
+            with urllib.request.urlopen(SERVER + "/poll?v=" + VERSION, timeout=10) as resp:
                 data = json.loads(resp.read())
 
             _set_status("🟢 Connected")

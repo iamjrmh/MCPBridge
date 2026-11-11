@@ -8,7 +8,7 @@
 
 ## 1. What MCPBridge is
 
-MCPBridge is a single MCP server (`mcp-server/index.js`) that exposes **17 tools**
+MCPBridge is a single MCP server (`mcp-server/index.js`) that exposes **34 tools**
 over stdio and bridges them to two live applications over local HTTP:
 
 ```
@@ -28,13 +28,30 @@ Claude Code the tools are namespaced as `mcp__mcpbridge__<tool_name>` (e.g.
 
 ### How the bridge actually works (important)
 
-- The plugins are **pollers**, not servers. The Roblox/Blender plugin polls the
-  MCPBridge server every few seconds for queued commands, runs them, and POSTs
-  results back.
+- The plugins are **pollers**, not servers. The Roblox/Blender plugin keeps a poll open to the
+  MCPBridge server, runs each command the moment it arrives, and POSTs the result back.
+- Several agent sessions can be open at once: they share one plugin connection.
 - Every command tool **blocks until the plugin returns a result**, with a
-  **30-second timeout**. A timeout almost always means the plugin is not active.
+  **60-second timeout** (pass `timeout_seconds`, up to 600, for long jobs). If the plugin is not connected the tool says so within a few seconds, with the steps to connect it.
 - The server keeps a plugin "connected" only if it has polled within the **last
   8 seconds**. Stale connections silently report as disconnected.
+
+---
+
+## 1a. Freedom first (v1.1)
+
+`studio_execute_lua` and `blender_execute_python` run arbitrary code with the application's full
+scripting API and return values, printed output and errors (with a traceback). Anything is possible
+through them. The focused tools are shortcuts and are usually less typing:
+
+- Explore: `studio_get_tree`, `studio_find_instances`, `studio_get_properties`, `blender_get_object`
+- Build: `studio_create_instance` (nested children in one call), `studio_clone_instance`, `studio_insert_asset`
+- Change: `studio_set_properties` (many instances at once), `studio_move_instance`, `studio_delete_instance`
+- Scripts: `studio_edit_script` for a small change, `studio_write_script` for a whole file
+- Safety net: every change is one undo step; `studio_undo` takes it back
+
+Values are plain JSON: Vector3 `[x,y,z]`, Color3 `"#RRGGBB"`, CFrame `{"position":[...],"rotation":[...]}`
+(degrees), UDim2 `[xs,xo,ys,yo]`, enums by name, instances by path.
 
 ---
 

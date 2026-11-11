@@ -3,7 +3,7 @@
   "name": "io.github.iamjrmh/mcpbridge",
   "title": "MCPBridge",
   "description": "Unified MCP server bridging Claude Code and Ollama to Roblox Studio and Blender.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "repository": {
     "url": "https://github.com/iamjrmh/MCPBridge",
     "source": "github",
@@ -14,7 +14,7 @@
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "@iamjrmh/mcpbridge",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "transport": {
         "type": "stdio"
       }

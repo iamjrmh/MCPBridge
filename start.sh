@@ -26,13 +26,6 @@ else
     echo "✅ Ollama found: $(ollama --version 2>/dev/null || echo 'version unknown')"
 fi
 
-# 3. Install dependencies if needed
-if [ ! -d "$SERVER_DIR/node_modules" ]; then
-    echo ""
-    echo "📦 Installing npm dependencies..."
-    cd "$SERVER_DIR" && npm install
-fi
-
 # 4. Print config instructions
 echo ""
 echo "─────────────────────────────────────────"
@@ -42,7 +35,7 @@ echo "────────────────────────�
 cat <<EOF
 {
   "mcpServers": {
-    "roblox-ollama": {
+    "mcpbridge": {
       "command": "node",
       "args": ["$SERVER_DIR/index.js"]
     }
