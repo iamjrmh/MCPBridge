@@ -8,7 +8,7 @@
 
 ## 1. What MCPBridge is
 
-MCPBridge is a single MCP server (`mcp-server/index.js`) that exposes **34 tools**
+MCPBridge is a single MCP server (`mcp-server/index.js`) that exposes **35 tools**
 over stdio and bridges them to two live applications over local HTTP:
 
 ```

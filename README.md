@@ -194,7 +194,7 @@ MCPBridge uses a **single unified server** that handles both Roblox and Blender.
   "mcpServers": {
     "mcpbridge": {
       "command": "npx",
-      "args": ["-y", "@iamjrmh/mcpbridge"]
+      "args": ["-y", "@iamjrmh/mcpbridge@latest"]
     }
   }
 }
@@ -396,7 +396,7 @@ ports, so its tools all failed.
 
 **Fix:**
 1. Update to v1.1: replace `mcp-server/index.js` and `roblox-plugin/OllamaMCP.lua` (and the Blender add-on)
-   with the new files. If you use `npx @iamjrmh/mcpbridge`, it updates by itself.
+   with the new files. If you use npx, set the args to `["-y", "@iamjrmh/mcpbridge@latest"]` so it always runs the newest server.
 2. Close Claude Code, then end any leftover `node` (Windows: `node.exe`) processes in Task Manager / Activity Monitor once.
 3. Start Claude Code again and ask it to run `studio_status`.
 
